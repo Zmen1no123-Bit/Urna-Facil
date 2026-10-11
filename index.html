@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a1322">
+<meta name="referrer" content="strict-origin-when-cross-origin">
+<title>Urna Fácil — eleições informais pela internet</title>
+<style>
+/* ===== Cores e medidas (tema escuro é o padrão) ===== */
+:root{
+  --bg:#0a1322; --panel:#111f38; --panel2:#17294a; --line:#26406b;
+  --ink:#eaf0fb; --muted:#a3b5d3; --accent:#f3c34f;
+  --primary:#2f6fdc; --green:#158a52; --red:#c93642; --amber:#f3c34f;
+  --lcd:#e8ede3; --lcd-ink:#101a28; --focus:#ffd76a;
+  --shadow:0 10px 30px rgba(0,0,0,.35);
+  color-scheme:dark;
+}
+[data-theme="light"]{
+  --bg:#eef2f8; --panel:#ffffff; --panel2:#f1f5fb; --line:#c9d5ea;
+  --ink:#12203a; --muted:#4d5f7d; --accent:#8a5f00;
+  --primary:#1f5fcc; --shadow:0 8px 24px rgba(20,40,80,.12);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  padding-bottom:env(safe-area-inset-bottom)}
+h1{font-size:1.6rem;line-height:1.2;margin:0 0 .5rem}
+h2{font-size:1.15rem;margin:0 0 .5rem}
+p{margin:0 0 .75rem}
+.muted{color:var(--muted)}
+.small{font-size:.875rem}
+.hidden,[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:-999px;top:0;background:var(--accent);color:#000;padding:8px 12px;z-index:50}
+.skip:focus{left:8px;top:8px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+a{color:var(--primary)}
+[data-theme="dark"] a{color:#8db8ff}
+
+.wrap{max-width:960px;margin:0 auto;padding:0 16px}
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.top-in{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:10px;padding-bottom:10px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:1.15rem}
+.logo{width:36px;height:36px;border-radius:10px;background:var(--accent);display:grid;place-items:center}
+.logo svg{width:22px;height:22px}
+.top-actions{display:flex;gap:8px}
+main{padding:20px 0 40px;outline:none}
+footer{padding:0 0 28px;color:var(--muted);font-size:.8125rem}
+
+/* ===== Botões e campos ===== */
+.btn{appearance:none;border:1px solid transparent;border-radius:10px;padding:11px 16px;min-height:44px;
+  font:inherit;font-weight:700;cursor:pointer;background:var(--primary);color:#fff;touch-action:manipulation}
+.btn:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.5;cursor:not-allowed;filter:none}
+.btn.secondary{background:var(--panel2);color:var(--ink);border-color:var(--line)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.danger{background:var(--red)}
+.btn.armed{background:var(--red);color:#fff;border-color:var(--red)}
+.btn.sm{min-height:38px;padding:7px 12px;font-size:.9rem}
+.btn.block{width:100%}
+a.btn{display:inline-flex;align-items:center;text-decoration:none;color:#fff}
+a.btn.secondary{color:var(--ink)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+label{font-weight:700;font-size:.9rem}
+.hint{font-weight:400;color:var(--muted);font-size:.85rem}
+input[type=text],input[type=email],input[type=password],input[type=url],select,textarea{
+  width:100%;min-height:44px;padding:10px 12px;border-radius:10px;border:1px solid var(--line);
+  background:var(--bg);color:var(--ink);font:inherit}
+textarea{min-height:84px;resize:vertical}
+input:disabled,select:disabled{opacity:.6}
+.check{display:flex;gap:10px;align-items:flex-start;font-weight:600}
+.check input{width:22px;height:22px;margin-top:2px;flex:none}
+.fmsg{min-height:1.4em;font-size:.9rem;margin:0 0 10px}
+.fmsg.error{color:#ff8f98}
+[data-theme="light"] .fmsg.error{color:#b3202c}
+.fmsg.ok{color:#5fd49b}
+[data-theme="light"] .fmsg.ok{color:#0e6b3f}
+
+/* ===== Cartões e estados ===== */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card.center{text-align:center;max-width:520px;margin-left:auto;margin-right:auto}
+.notice{border-left:4px solid var(--accent);background:var(--panel2);padding:10px 12px;border-radius:8px;font-size:.9rem;margin:0 0 14px}
+.notice.error{border-color:var(--red)}
+.chip{display:inline-block;font-size:.8rem;font-weight:700;padding:2px 10px;border-radius:99px;border:1px solid var(--line);background:var(--panel2)}
+.chip.open{background:#12452f;border-color:#1f7a4f;color:#9ff0c8}
+.chip.closed{background:#4a1d23;border-color:#8a3039;color:#ffc2c7}
+[data-theme="light"] .chip.open{background:#d9f5e7;color:#0b5a35}
+[data-theme="light"] .chip.closed{background:#fbe0e3;color:#8c1f2b}
+.spin{display:inline-block;width:26px;height:26px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bigcheck{width:64px;height:64px;border-radius:50%;background:var(--green);color:#fff;font-size:34px;display:grid;place-items:center;margin:0 auto 12px}
+
+.tabs{display:flex;gap:6px;overflow-x:auto;margin:14px 0;padding-bottom:4px}
+.tabs button{white-space:nowrap}
+.tabs button[aria-selected="true"]{background:var(--primary);color:#fff;border-color:var(--primary)}
+
+.list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.item{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.item .t{font-weight:700;overflow-wrap:anywhere}
+.cands{display:grid;gap:10px;grid-template-columns:1fr}
+.cand{display:grid;grid-template-columns:54px 1fr auto;gap:12px;align-items:center;
+  background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:10px}
+.cand img{width:54px;height:72px;object-fit:cover;border-radius:6px;background:#cfd6c9}
+.cand .n{font-weight:700;overflow-wrap:anywhere}
+.cand .acts{grid-column:1/-1;display:flex;gap:8px}
+.num{display:inline-grid;place-items:center;min-width:44px;height:36px;padding:0 8px;border-radius:8px;
+  background:var(--accent);color:#111;font-weight:900;font-variant-numeric:tabular-nums}
+.photo-prev{width:72px;height:96px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+.stat{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:12px}
+.stat b{display:block;font-size:1.6rem;font-variant-numeric:tabular-nums}
+.res{margin:0 0 14px}
+.res-h{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.bar{height:12px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);overflow:hidden}
+.bar span{display:block;height:100%;background:var(--primary)}
+.bar.blank span{background:#8b97ad}
+.rank{display:inline-block;min-width:1.8em;font-weight:900;color:var(--accent)}
+
+.linkbox{display:flex;gap:8px;flex-wrap:wrap}
+.linkbox input{flex:1 1 220px}
+
+/* ===== A URNA (sempre vertical e centralizada) ===== */
+.urna{max-width:460px;margin:0 auto;background:#1b2230;border:1px solid #33405c;border-radius:22px;padding:14px;box-shadow:var(--shadow)}
+.lcd{background:var(--lcd);color:var(--lcd-ink);border-radius:12px;padding:14px;display:grid;
+  grid-template-columns:1fr auto;gap:12px;min-height:190px;align-items:start}
+.lcd p{margin:0 0 6px}
+.lcd-lbl{font-size:.8rem;font-weight:700}
+.lcd-name{font-size:1.25rem;font-weight:900;line-height:1.2;overflow-wrap:anywhere}
+.lcd-warn{font-weight:900;color:#8a1d28}
+.digits{display:flex;gap:6px;margin:6px 0 10px;flex-wrap:wrap}
+.digit{width:34px;height:44px;border:2px solid var(--lcd-ink);border-radius:5px;display:grid;place-items:center;
+  font:800 24px/1 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+.lcd .photo{width:96px;aspect-ratio:3/4;object-fit:cover;border:2px solid #1b2230;border-radius:6px;background:#cfd6c9}
+.lcd .photo.dim{opacity:.35}
+.keys{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.key{appearance:none;min-height:58px;font:800 24px/1 system-ui,sans-serif;background:#0e131c;color:#fff;
+  border:1px solid #3a4866;border-radius:10px;cursor:pointer;touch-action:manipulation}
+.key.zero{grid-column:2}
+.key:active:not(:disabled){background:#222c3f}
+.actions3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.actions3.two{grid-template-columns:repeat(2,1fr)}
+.act{appearance:none;min-height:60px;border:0;border-radius:10px;font:800 .95rem/1.1 system-ui,sans-serif;cursor:pointer;touch-action:manipulation}
+.act.blank{background:#f4f6fa;color:#111}
+.act.fix{background:var(--red);color:#fff}
+.act.ok{background:var(--green);color:#fff}
+.key:disabled,.act:disabled{opacity:.45;cursor:not-allowed}
+.vmsg{max-width:460px;margin:12px auto 0;min-height:1.5em;text-align:center;font-weight:600}
+.vmsg.error{color:#ff8f98}
+[data-theme="light"] .vmsg.error{color:#b3202c}
+.vmsg.ok{color:#5fd49b}
+[data-theme="light"] .vmsg.ok{color:#0e6b3f}
+.vote-head{max-width:460px;margin:0 auto 14px}
+
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom));
+  max-width:min(92vw,520px);background:#0b1220;color:#fff;border:1px solid #3a4866;border-radius:12px;
+  padding:12px 16px;box-shadow:var(--shadow);z-index:40;font-weight:600}
+#toast.error{border-color:var(--red);background:#3a141a}
+#toast.ok{border-color:#1f7a4f}
+
+@media (min-width:700px){
+  .cands{grid-template-columns:1fr 1fr}
+  .stats{grid-template-columns:repeat(3,1fr)}
+  h1{font-size:1.9rem}
+}
+/* Celular deitado: mantém a urna vertical e compacta os botões. */
+@media (orientation:landscape) and (max-height:520px){
+  .key{min-height:46px;font-size:20px}
+  .act{min-height:48px}
+  .lcd{min-height:150px}
+  .top-in{padding-top:6px;padding-bottom:6px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#app">Ir para o conteúdo</a>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="brand">
+      <span class="logo" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg>
+      </span>
+      <span>Urna Fácil</span>
+    </div>
+    <div class="top-actions">
+      <button id="themeBtn" class="btn ghost sm" type="button"></button>
+      <button id="logoutBtn" class="btn ghost sm hidden" type="button" data-action="logout">Sair</button>
+    </div>
+  </div>
+</header>
+
+<main id="app" class="wrap" tabindex="-1"></main>
+
+<footer class="wrap">
+  <p>Urna Fácil é um projeto educacional para eleições informais (turma, grêmio, enquetes). Não é um sistema oficial da Justiça Eleitoral e não serve para eleições que exijam validade jurídica.</p>
+  <p id="footLink"></p>
+</footer>
+
+<div id="toast" class="hidden" role="status" aria-live="polite"></div>
+
+<!-- Biblioteca oficial do Supabase, versão fixa. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.110.1/dist/umd/supabase.js"></script>
+<script>
+'use strict';
+
+/* =====================================================================
+   1) CONFIGURAÇÃO — é aqui que você cola os dados do seu projeto Supabase
+   ===================================================================== */
+// Supabase > Project Settings > API > "Project URL"   (ex.: https://abcdefgh.supabase.co)
+const SUPABASE_URL = 'https://qwtlholwwnnfivnvnwku.supabase.co';
+// Supabase > Project Settings > API Keys > chave PÚBLICA ("anon" ou "publishable").
+// NUNCA cole a chave "service_role" ou "secret" aqui.
+const SUPABASE_KEY = 'sb_publishable_OSEM9A9FwzSpWm1Z_t-wWg_QOGiPiP_';
+// Opcional: endereço público do seu site (ex.: https://usuario.github.io/urna-facil/).
+// Deixe vazio para o sistema usar o endereço da página aberta.
+const SITE_URL = 'zmen1no123-bit.github.io/Urna-Facil';
+
+/* =====================================================================
+   2) UTILITÁRIOS
+   ===================================================================== */
+const $ = (sel, root = document) => root.querySelector(sel);
+const app = $('#app');
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const nfInt = new Intl.NumberFormat('pt-BR');
+const nfPct = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+const dfDate = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
+const PLACEHOLDER = 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(
+  '<svg xmlns="http://www.w3.org/2000/svg" width="150" height="200"><rect width="100%" height="100%" fill="#cfd6c9"/>' +
+  '<circle cx="75" cy="78" r="30" fill="#8d998a"/><path d="M20 200Q25 125 75 125Q125 125 130 200" fill="#8d998a"/></svg>');
+const STATUS_LABEL = { draft: 'Rascunho', open: 'Votação aberta', closed: 'Encerrada' };
+
+const photoSrc = url => (typeof url === 'string' && /^https:\/\/\S+$/i.test(url)) ? url : PLACEHOLDER;
+const pageBase = () => (SITE_URL || location.href).split(/[?#]/)[0];
+const shareUrl = id => `${pageBase()}?eleicao=${id}`;
+const fmtDate = v => { try { return dfDate.format(new Date(v)); } catch { return ''; } };
+
+// Foto que não carrega: troca pelo desenho padrão.
+document.addEventListener('error', e => {
+  const t = e.target;
+  if (t && t.tagName === 'IMG' && !t.dataset.failed) { t.dataset.failed = '1'; t.src = PLACEHOLDER; }
+}, true);
+
+let toastTimer = null;
+function toast(msg, kind = '') {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.className = kind;
+  t.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), kind === 'error' ? 9000 : 4500);
+}
+$('#toast').addEventListener('click', () => $('#toast').classList.add('hidden'));
+
+/* Converte erros técnicos em mensagens claras (o detalhe técnico vai só para o console). */
+function friendly(err) {
+  if (!err) return 'Algo deu errado. Tente novamente.';
+  const m = String(err.message || '').toLowerCase();
+  const code = String(err.code || '');
+  const status = err.status;
+  if (m.includes('invalid api key') || m.includes('no api key') || (status === 401 && m.includes('apikey'))) {
+    return 'A chave pública do Supabase está incorreta. Confira a chave colada no início do index.html.';
+  }
+  if (!navigator.onLine || status === 0 || err.name === 'AuthRetryableFetchError' ||
+      m.includes('failed to fetch') || m.includes('networkerror') || m.includes('load failed') || m.includes('network request failed')) {
+    return 'Não foi possível conectar ao servidor. Verifique sua internet e a URL do Supabase, e tente de novo.';
+  }
+  if (m.includes('invalid login credentials')) return 'E-mail ou senha incorretos.';
+  if (m.includes('email not confirmed')) return 'Confirme seu e-mail antes de entrar. Procure a mensagem na caixa de entrada (veja também o spam).';
+  if (m.includes('user already registered')) return 'Já existe uma conta com este e-mail. Use a aba "Entrar".';
+  if (m.includes('password should be at least') || m.includes('weak password')) return 'A senha é fraca demais. Use pelo menos 8 caracteres.';
+  if (m.includes('unable to validate email') || m.includes('invalid email')) return 'O e-mail informado não parece válido.';
+  if (m.includes('anonymous sign-ins are disabled')) return 'O login anônimo está desativado no Supabase. O administrador do sistema precisa ativá-lo (veja o README).';
+  if (m.includes('signups not allowed') || m.includes('signup is disabled')) return 'O cadastro de novas contas está desativado neste projeto.';
+  if (status === 429 || m.includes('rate limit') || m.includes('too many')) return 'Muitas tentativas em pouco tempo. Aguarde alguns minutos e tente de novo.';
+  if (code === 'PGRST202' || code === '42P01' || code === 'PGRST205' || m.includes('could not find the function')) {
+    return 'O banco de dados ainda não foi configurado. Execute o arquivo supabase.sql no Supabase (veja o README).';
+  }
+  if (code === 'P0001') return err.message;           // mensagens escritas por nós no SQL
+  if (code === '23505') return 'Já existe um registro igual (por exemplo, esse número já está em uso nesta eleição).';
+  if (code === '23514') return 'Algum dado está fora do permitido. Confira os campos e tente de novo.';
+  if (code === '42501' || m.includes('row-level security')) return 'Você não tem permissão para fazer isso.';
+  if (code === 'PGRST116') return 'Não encontramos esse registro ou você não tem permissão para alterá-lo.';
+  return 'Não foi possível concluir a operação. Tente novamente em instantes.';
+}
+
+const isNetworkError = err => friendly(err).startsWith('Não foi possível conectar');
+
+function configProblem() {
+  const url = SUPABASE_URL.trim(), key = SUPABASE_KEY.trim();
+  if (!url || url.includes('COLE_AQUI')) return 'A URL do projeto Supabase ainda não foi preenchida.';
+  if (!/^https:\/\/[^\s/]+\/?$/.test(url)) return 'A URL do Supabase parece incorreta. Ela deve ter o formato https://xxxx.supabase.co (sem nada depois do endereço).';
+  if (!key || key.includes('COLE_AQUI')) return 'A chave pública do Supabase ainda não foi preenchida.';
+  if (/^sb_secret_/i.test(key)) return 'Você colou uma chave SECRETA. Chaves secretas nunca podem ficar no navegador. Use a chave pública (anon ou publishable).';
+  try {
+    const part = key.split('.')[1];
+    if (part) {
+      const role = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/'))).role;
+      if (role === 'service_role') return 'Você colou a chave "service_role", que é secreta. Use a chave "anon" (pública).';
+    }
+  } catch { /* chave em outro formato: segue adiante */ }
+  return null;
+}
+
+/* =====================================================================
+   3) ESTADO GLOBAL E INICIALIZAÇÃO
+   ===================================================================== */
+let sb = null;
+const S = { mode: 'boot', session: null, userId: null, elections: [], authTab: 'login', editor: null };
+let V = null;           // estado da tela de votação (eleitor)
+let timers = [];
+
+const isOrganizer = () => !!(S.session && S.session.user && !S.session.user.is_anonymous);
+function stopTimers() { timers.forEach(clearInterval); timers = []; }
+
+function setView(html) {
+  app.innerHTML = html;
+  window.scrollTo(0, 0);
+  const h = app.querySelector('h1');
+  if (h) { h.setAttribute('tabindex', '-1'); h.focus({ preventScroll: true }); }
+}
+const loadingHtml = text => `<div class="card center" role="status"><span class="spin" aria-hidden="true"></span><p>${esc(text)}</p></div>`;
+const infoHtml = (title, text, buttons = '') =>
+  `<section class="card center"><h1>${esc(title)}</h1><p>${esc(text)}</p>${buttons ? `<div class="row" style="justify-content:center">${buttons}</div>` : ''}</section>`;
+
+function initTheme() {
+  let t = 'dark';
+  try { t = localStorage.getItem('urna_theme') || 'dark'; } catch { /* sem armazenamento */ }
+  applyTheme(t);
+  $('#themeBtn').addEventListener('click', () => applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'));
+}
+function applyTheme(t) {
+  document.documentElement.dataset.theme = t;
+  $('#themeBtn').textContent = t === 'dark' ? 'Tema claro' : 'Tema escuro';
+  document.querySelector('meta[name="theme-color"]').content = t === 'dark' ? '#0a1322' : '#eef2f8';
+  try { localStorage.setItem('urna_theme', t); } catch { /* ignora */ }
+}
+
+async function boot() {
+  initTheme();
+  const problem = configProblem();
+  if (problem) {
+    setView(`<section class="card"><h1>Falta configurar o Supabase</h1><p>${esc(problem)}</p>
+      <p>Abra o arquivo <strong>index.html</strong> em um editor de texto e procure o trecho <strong>CONFIGURAÇÃO</strong>, no começo do script. Cole ali a URL do projeto e a chave pública. O passo a passo está no README.</p></section>`);
+    return;
+  }
+  if (!window.supabase || !window.supabase.createClient) {
+    setView(infoHtml('Não foi possível carregar o sistema', 'A biblioteca do Supabase não carregou. Verifique sua conexão com a internet e recarregue a página.',
+      '<button class="btn" type="button" data-action="reload">Recarregar</button>'));
+    return;
+  }
+  sb = window.supabase.createClient(SUPABASE_URL.trim().replace(/\/+$/, ''), SUPABASE_KEY.trim(),
+    { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+
+  // Só reage quando a PESSOA muda (entrou/saiu). Assim a tela não é refeita
+  // sem querer quando o Supabase apenas renova a sessão em segundo plano.
+  sb.auth.onAuthStateChange((event, session) => {
+    S.session = session;
+    if (event === 'INITIAL_SESSION') return;   // a primeira tela é aberta pelo boot()
+    const newId = session && session.user ? session.user.id : null;
+    if (newId === S.userId) return;
+    S.userId = newId;
+    if (S.mode === 'voter') return;
+    setTimeout(route, 0);   // evita chamar o Supabase de dentro do próprio callback
+  });
+
+  try {
+    const { data, error } = await sb.auth.getSession();
+    if (error) throw error;
+    S.session = data.session;
+    S.userId = data.session && data.session.user ? data.session.user.id : null;
+  } catch (err) {
+    console.error(err);
+  }
+  route();
+}
+
+function route() {
+  stopTimers();
+  const params = new URLSearchParams(location.search);
+  const ele = params.get('eleicao');
+  $('#logoutBtn').classList.toggle('hidden', !isOrganizer() || ele !== null);
+  if (ele !== null) { S.mode = 'voter'; $('#footLink').innerHTML = `<a href="${esc(pageBase())}">Sou organizador</a>`; startVoter(ele.trim()); }
+  else { S.mode = 'admin'; $('#footLink').textContent = ''; startAdmin(); }
+}
+
+/* =====================================================================
+   4) ÁREA DO ELEITOR
+   ===================================================================== */
+async function startVoter(id) {
+  V = null;
+  if (!UUID_RE.test(id)) {
+    setView(infoHtml('Link inválido', 'O endereço da eleição está incompleto ou foi alterado. Peça ao organizador para enviar o link de novo.'));
+    return;
+  }
+  setView(loadingHtml('Carregando a eleição…'));
+  const { data, error } = await sb.rpc('get_public_election', { p_election_id: id });
+  if (error) {
+    console.error(error);
+    setView(infoHtml('Não foi possível abrir a eleição', friendly(error), '<button class="btn" type="button" data-action="reload">Tentar de novo</button>'));
+    return;
+  }
+  if (!data || !data.ok) {
+    setView(infoHtml('Eleição não encontrada', 'Não existe nenhuma eleição com este link. Confira se o endereço foi copiado por inteiro.'));
+    return;
+  }
+  V = { election: data.election, candidates: data.candidates || [], voted: !!data.already_voted,
+        digits: '', blank: false, sending: false, maybeSent: false, done: null, showResults: false, results: null };
+  renderVoter();
+}
+
+function renderVoter() {
+  const el = V.election;
+  $('#footLink').innerHTML = `<a href="${esc(pageBase())}">Sou organizador</a>`;
+  if (V.showResults) return renderPublicResults();
+  if (V.done || V.voted) return setView(doneHtml());
+  if (el.status === 'draft') {
+    return setView(infoHtml(el.title, 'Esta votação ainda não começou. Volte mais tarde e toque em "Verificar de novo".',
+      '<button class="btn" type="button" data-action="reload">Verificar de novo</button>'));
+  }
+  if (el.status === 'closed') {
+    const btn = el.results_public ? '<button class="btn" type="button" data-action="showResults">Ver apuração</button>' : '';
+    return setView(infoHtml('Eleição encerrada', `A votação "${el.title}" foi encerrada e não aceita mais votos.`, btn));
+  }
+  const keys = ['1','2','3','4','5','6','7','8','9'].map(k => `<button class="key" type="button" data-key="${k}" aria-label="Número ${k}">${k}</button>`).join('') +
+    `<button class="key zero" type="button" data-key="0" aria-label="Número 0">0</button>`;
+  setView(`
+    <section class="vote-head">
+      <h1>${esc(el.title)}</h1>
+      ${el.description ? `<p class="muted">${esc(el.description)}</p>` : ''}
+      <p class="small">Digite o número do candidato, confira os dados na tela e aperte <strong>CONFIRMA</strong>. Para recomeçar, aperte <strong>CORRIGE</strong>.</p>
+    </section>
+    <section class="urna" id="urna" aria-label="Urna de votação">
+      <div class="lcd" id="lcd"></div>
+      <div class="keys" role="group" aria-label="Teclado numérico">${keys}</div>
+      <div class="actions3 ${el.allow_blank ? '' : 'two'}">
+        ${el.allow_blank ? '<button class="act blank" type="button" id="blankBtn">BRANCO</button>' : ''}
+        <button class="act fix" type="button" id="fixBtn">CORRIGE</button>
+        <button class="act ok" type="button" id="okBtn" disabled>CONFIRMA</button>
+      </div>
+    </section>
+    <p class="vmsg" id="vmsg" role="status" aria-live="polite"></p>
+    <div class="sr" id="vsr" aria-live="polite"></div>
+    <details class="card" style="max-width:460px;margin:16px auto 0">
+      <summary><strong>Ver lista de candidatos</strong></summary>
+      <ul class="list" style="margin-top:10px">${V.candidates.map(c => `
+        <li class="item"><span><span class="num">${esc(c.number)}</span> <span class="t">${esc(c.name)}</span><br><span class="muted small">${esc(c.party || 'Sem partido ou grupo')}</span></span></li>`).join('')}</ul>
+    </details>
+    <p class="muted small" style="max-width:460px;margin:12px auto 0">Cada navegador conta como um eleitor. O sistema não consegue comprovar a identidade de quem vota.</p>`);
+  updateUrna();
+}
+
+function urnaState() {
+  const n = V.election.digits;
+  if (V.blank) return { kind: 'blank' };
+  if (V.digits.length === n) {
+    const c = V.candidates.find(x => x.number === V.digits);
+    return c ? { kind: 'match', c } : { kind: 'invalid' };
+  }
+  return { kind: 'typing' };
+}
+
+function updateUrna() {
+  const lcd = $('#lcd');
+  if (!lcd) return;
+  const st = urnaState();
+  const n = V.election.digits;
+  const boxes = Array.from({ length: n }, (_, i) => `<span class="digit">${esc(V.digits[i] || '')}</span>`).join('');
+  let main, sr, photo = PLACEHOLDER, alt = '';
+  if (st.kind === 'blank') {
+    main = '<p class="lcd-name">Voto em branco</p><p>Você não escolheu nenhum candidato.</p>';
+    sr = 'Voto em branco selecionado. Aperte CONFIRMA para votar ou CORRIGE para voltar.';
+  } else if (st.kind === 'match') {
+    const c = st.c;
+    main = `<p class="lcd-name">${esc(c.name)}</p><p>${esc(c.party || 'Sem partido ou grupo')}</p>`;
+    sr = `Candidato ${c.name}, ${c.party || 'sem partido ou grupo'}, número ${V.digits}. Aperte CONFIRMA para votar ou CORRIGE para voltar.`;
+    photo = photoSrc(c.photo_url); alt = 'Foto de ' + c.name;
+  } else if (st.kind === 'invalid') {
+    main = '<p class="lcd-warn">Número inexistente</p><p>Nenhum candidato tem esse número. Aperte CORRIGE e digite outro.</p>';
+    sr = 'Número inexistente. Aperte CORRIGE e digite outro número.';
+  } else {
+    main = '<p>Digite o número do seu candidato.</p>';
+    sr = V.digits ? `Número digitado: ${V.digits.split('').join(' ')}.` : 'Nenhum número digitado.';
+  }
+  lcd.innerHTML = `<div><p class="lcd-lbl">Seu voto para</p>${st.kind === 'blank' ? '' : `<div class="digits" aria-hidden="true">${boxes}</div>`}${main}</div>
+    <img class="photo ${st.kind === 'match' ? '' : 'dim'}" src="${esc(photo)}" alt="${esc(alt)}" referrerpolicy="no-referrer">`;
+  $('#vsr').textContent = sr;
+  $('#okBtn').disabled = V.sending || !(st.kind === 'match' || st.kind === 'blank');
+  document.querySelectorAll('.key').forEach(b => { b.disabled = V.sending; });
+  const fix = $('#fixBtn'), blank = $('#blankBtn');
+  if (fix) fix.disabled = V.sending;
+  if (blank) blank.disabled = V.sending;
+}
+
+function vmsg(text, kind = '') {
+  const m = $('#vmsg');
+  if (!m) return;
+  m.textContent = text;
+  m.className = 'vmsg' + (kind ? ' ' + kind : '');
+}
+
+function pressKey(k) {
+  if (!V || V.sending) return;
+  if (V.blank) { V.blank = false; V.digits = ''; }
+  if (V.digits.length >= V.election.digits) return;   // nunca passa da quantidade configurada
+  V.digits += k;
+  vmsg('');
+  updateUrna();
+}
+function correct() {
+  if (!V || V.sending) return;
+  V.digits = ''; V.blank = false;
+  vmsg('');
+  updateUrna();
+}
+function blankVote() {
+  if (!V || V.sending || !V.election.allow_blank) return;
+  V.blank = true; V.digits = '';
+  vmsg('');
+  updateUrna();
+}
+
+async function ensureVoterSession() {
+  const { data, error } = await sb.auth.getSession();
+  if (error) throw error;
+  if (data.session) return data.session;
+  const res = await sb.auth.signInAnonymously();
+  if (res.error) throw res.error;
+  return res.data.session;
+}
+
+const VOTE_MSG = {
+  closed: 'Esta eleição foi encerrada e não aceita mais votos.',
+  not_open: 'Esta votação ainda não foi aberta.',
+  not_found: 'Eleição não encontrada.',
+  invalid_number: 'Número inexistente. Aperte CORRIGE e digite outro.',
+  blank_not_allowed: 'Voto em branco não é permitido nesta eleição.',
+  invalid_request: 'Pedido inválido. Aperte CORRIGE e tente de novo.',
+  not_authenticated: 'Sua sessão expirou. Aperte CONFIRMA de novo.'
+};
+
+async function confirmVote() {
+  if (!V || V.sending) return;                        // evita toques repetidos
+  const st = urnaState();
+  if (!(st.kind === 'match' || st.kind === 'blank')) return;
+  V.sending = true;
+  updateUrna();
+  vmsg('Registrando seu voto…');
+  let reachedServer = false;
+  try {
+    await ensureVoterSession();
+    reachedServer = true;                              // a partir daqui o voto pode ter sido gravado
+    const { data, error } = await sb.rpc('cast_vote', {
+      p_election_id: V.election.id,
+      p_number: V.blank ? null : V.digits,
+      p_blank: V.blank
+    });
+    if (error) throw error;
+    V.sending = false;
+    if (data && data.ok) { V.done = 'recorded'; return renderVoter(); }       // sucesso só após o servidor confirmar
+    const code = data && data.code;
+    if (code === 'already_voted') { V.done = V.maybeSent ? 'recorded' : 'already'; return renderVoter(); }
+    if (code === 'closed') { V.election.status = 'closed'; return renderVoter(); }
+    V.maybeSent = false;
+    if (code === 'blank_not_allowed') V.election.allow_blank = false;
+    updateUrna();
+    vmsg(VOTE_MSG[code] || 'Não foi possível registrar o voto. Tente de novo.', 'error');
+  } catch (err) {
+    console.error(err);
+    V.sending = false;
+    updateUrna();
+    if (reachedServer && isNetworkError(err)) {
+      V.maybeSent = true;
+      vmsg('A conexão falhou e não sabemos se o voto chegou ao servidor. Aperte CONFIRMA de novo: o sistema nunca registra o mesmo eleitor duas vezes.', 'error');
+    } else {
+      V.maybeSent = false;
+      vmsg(friendly(err), 'error');
+    }
+  }
+}
+
+function doneHtml() {
+  const el = V.election;
+  const link = (el.status === 'closed' && el.results_public) ? '<button class="btn secondary" type="button" data-action="showResults">Ver apuração</button>' : '';
+  if (V.done === 'recorded') {
+    return `<section class="card center"><div class="bigcheck" aria-hidden="true">✓</div><h1>Voto registrado</h1>
+      <p>Obrigado por participar de "${esc(el.title)}". Você já pode fechar esta página.</p>${link}</section>`;
+  }
+  return `<section class="card center"><div class="bigcheck" aria-hidden="true">✓</div><h1>Você já votou nesta eleição</h1>
+    <p>Este navegador já tem um voto registrado em "${esc(el.title)}". Cada navegador conta como um eleitor.</p>${link}</section>`;
+}
+
+async function renderPublicResults() {
+  setView(loadingHtml('Carregando a apuração…'));
+  const { data, error } = await sb.rpc('get_election_results', { p_election_id: V.election.id });
+  const back = '<button class="btn secondary" type="button" data-action="hideResults">Voltar</button>';
+  if (error) { console.error(error); return setView(infoHtml('Apuração indisponível', friendly(error), back)); }
+  if (!data || !data.ok) return setView(infoHtml('Apuração indisponível', RES_MSG[data && data.code] || 'Não foi possível carregar a apuração.', back));
+  setView(`<section class="card"><h1>${esc(data.election.title)}</h1>${resultsBodyHtml(data)}<div class="row">${back}</div></section>`);
+}
+
+/* Teclado físico: números digitam, Backspace/Delete corrige, Enter confirma. */
+document.addEventListener('keydown', e => {
+  if (S.mode !== 'voter' || !V || !$('#urna') || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
+  const t = e.target;
+  if (t && t.matches && t.matches('input,textarea,select')) return;
+  if (/^[0-9]$/.test(e.key)) { e.preventDefault(); pressKey(e.key); }
+  else if (e.key === 'Backspace' || e.key === 'Delete') { e.preventDefault(); correct(); }
+  else if (e.key === 'Enter' && !(t && t.tagName === 'BUTTON')) { e.preventDefault(); if (!$('#okBtn').disabled) confirmVote(); }
+});
+
+/* =====================================================================
+   5) APURAÇÃO (usada pelo organizador e pela página pública)
+   ===================================================================== */
+const RES_MSG = {
+  not_found: 'Eleição não encontrada.',
+  not_available: 'A apuração só é divulgada depois que a eleição for encerrada.',
+  private: 'O organizador optou por não divulgar a apuração publicamente.'
+};
+
+function resultsBodyHtml(r) {
+  const el = r.election, total = r.total || 0, cands = r.candidates || [];
+  const pct = n => total ? nfPct.format(n / total * 100) + '%' : '0,0%';
+  const width = n => total ? (n / total * 100).toFixed(1) : 0;
+  const rows = cands.map(c => {
+    const pos = 1 + cands.filter(o => o.votes > c.votes).length;
+    return `<div class="res"><div class="res-h"><strong><span class="rank">${pos}º</span>${esc(c.name)} <span class="muted">(${esc(c.number)}${c.party ? ' · ' + esc(c.party) : ''})</span></strong>
+      <span>${nfInt.format(c.votes)} voto(s) · ${pct(c.votes)}</span></div>
+      <div class="bar" role="img" aria-label="${esc(c.name)}: ${pct(c.votes)}"><span style="width:${width(c.votes)}%"></span></div></div>`;
+  }).join('');
+  const blankRow = el.allow_blank ? `<div class="res"><div class="res-h"><strong>Votos em branco</strong><span>${nfInt.format(r.blank)} voto(s) · ${pct(r.blank)}</span></div>
+      <div class="bar blank" role="img" aria-label="Brancos: ${pct(r.blank)}"><span style="width:${width(r.blank)}%"></span></div></div>` : '';
+  return `<p><span class="chip ${el.status}">${esc(STATUS_LABEL[el.status] || el.status)}</span>
+      ${el.closed_at ? `<span class="muted small"> Encerrada em ${esc(fmtDate(el.closed_at))}</span>` : ''}</p>
+    <div class="stats">
+      <div class="stat"><span class="muted">Votos computados</span><b>${nfInt.format(total)}</b></div>
+      <div class="stat"><span class="muted">Votos em candidatos</span><b>${nfInt.format(total - r.blank)}</b></div>
+      <div class="stat"><span class="muted">Votos em branco</span><b>${nfInt.format(r.blank)}</b></div>
+    </div>
+    ${cands.length ? rows : '<p class="muted">Esta eleição não tem candidatos.</p>'}${blankRow}
+    <p class="muted small">Percentuais calculados sobre o total de votos computados. Votos nulos não existem neste sistema: um número inexistente não pode ser confirmado.</p>`;
+}
+
+/* =====================================================================
+   6) ÁREA DO ORGANIZADOR
+   ===================================================================== */
+async function startAdmin() {
+  if (!isOrganizer()) return renderAuth();
+  setView(loadingHtml('Carregando suas eleições…'));
+  try { await loadElections(); renderHome(); }
+  catch (err) {
+    console.error(err);
+    setView(infoHtml('Não foi possível carregar suas eleições', friendly(err), '<button class="btn" type="button" data-action="reload">Tentar de novo</button>'));
+  }
+}
+async function loadElections() {
+  const { data, error } = await sb.rpc('list_my_elections');
+  if (error) throw error;
+  S.elections = data || [];
+}
+
+function renderAuth() {
+  const login = S.authTab === 'login';
+  setView(`
+    <section class="card" style="max-width:520px;margin-left:auto;margin-right:auto">
+      <h1>Crie uma eleição e receba votos pela internet</h1>
+      <p class="muted">Para organizadores: cadastre candidatos, abra a votação e compartilhe um link. Quem vai votar não precisa de conta: basta abrir o link.</p>
+      <div class="tabs" role="tablist" aria-label="Acesso do organizador">
+        <button class="btn secondary sm" role="tab" type="button" data-action="authTab" data-tab="login" aria-selected="${login}">Entrar</button>
+        <button class="btn secondary sm" role="tab" type="button" data-action="authTab" data-tab="signup" aria-selected="${!login}">Criar conta</button>
+      </div>
+      <form data-form="${login ? 'login' : 'signup'}" novalidate>
+        <div class="field"><label for="aEmail">E-mail</label><input id="aEmail" type="email" autocomplete="email" required></div>
+        <div class="field"><label for="aPass">Senha ${login ? '' : '<span class="hint">(mínimo de 8 caracteres)</span>'}</label>
+          <input id="aPass" type="password" autocomplete="${login ? 'current-password' : 'new-password'}" required minlength="8"></div>
+        <p class="fmsg" role="status"></p>
+        <button class="btn block" type="submit">${login ? 'Entrar' : 'Criar conta'}</button>
+      </form>
+    </section>
+    <p class="muted" style="text-align:center">Recebeu um link de votação? Abra-o diretamente: você não precisa entrar aqui.</p>`);
+}
+
+function renderHome() {
+  const list = S.elections.length ? `<ul class="list">${S.elections.map(e => `
+    <li class="item"><div><div class="t">${esc(e.title)}</div>
+      <div class="muted small"><span class="chip ${esc(e.status)}">${esc(STATUS_LABEL[e.status])}</span>
+      ${nfInt.format(e.candidate_count)} candidato(s) · ${nfInt.format(e.vote_count)} voto(s)</div></div>
+      <button class="btn secondary sm" type="button" data-action="openElection" data-id="${esc(e.id)}">Abrir</button></li>`).join('')}</ul>`
+    : `<p class="muted">Você ainda não criou nenhuma eleição. Toque em "Nova eleição" para começar.</p>`;
+  setView(`<section class="card"><div class="row" style="justify-content:space-between"><h1 style="margin:0">Minhas eleições</h1>
+      <button class="btn" type="button" data-action="newElection">Nova eleição</button></div>
+      <p class="muted small">Conectado como ${esc(S.session.user.email || '')}</p>${list}</section>`);
+}
+
+/* ---------- Editor de eleição ---------- */
+async function openEditor(id, tab = 'candidatos') {
+  stopTimers();
+  setView(loadingHtml('Abrindo a eleição…'));
+  try {
+    const [e, c] = await Promise.all([
+      sb.from('elections').select('*').eq('id', id).single(),
+      sb.from('candidates').select('*').eq('election_id', id).order('number')
+    ]);
+    if (e.error) throw e.error;
+    if (c.error) throw c.error;
+    const info = S.elections.find(x => x.id === id);
+    S.editor = { election: e.data, candidates: c.data || [], tab, editId: null, results: null, resultsErr: null, resultsAt: null, auto: true, voteCount: info ? info.vote_count : 0 };
+    renderEditor();
+  } catch (err) {
+    console.error(err);
+    setView(infoHtml('Não foi possível abrir a eleição', friendly(err), '<button class="btn" type="button" data-action="backHome">Voltar</button>'));
+  }
+}
+
+function newElectionView() {
+  stopTimers();
+  S.editor = { election: null, candidates: [], tab: 'configurar' };
+  renderEditor();
+}
+
+function renderEditor() {
+  const E = S.editor;
+  setView(`<section><div id="edHead"></div><div id="edTabs" class="tabs" role="tablist" aria-label="Seções da eleição"></div><div id="edPanel"></div></section>`);
+  renderEdHead(); renderEdTabs(); renderEdPanel();
+  if (E.election && E.tab === 'apuracao') startResultsTab();
+}
+
+function renderEdHead() {
+  const E = S.editor, el = E.election;
+  const back = '<button class="btn ghost sm" type="button" data-action="backHome">← Minhas eleições</button>';
+  if (!el) { $('#edHead').innerHTML = `${back}<h1 style="margin-top:12px">Nova eleição</h1>`; return; }
+  let action = '';
+  if (el.status === 'draft') {
+    action = `<button class="btn" type="button" data-action="startVoting" data-confirm="Confirmar: abrir a votação?" ${E.candidates.length ? '' : 'disabled'}>Abrir votação</button>`;
+  } else if (el.status === 'open') {
+    action = `<button class="btn danger" type="button" data-action="closeVoting" data-confirm="Confirmar: encerrar para sempre?">Encerrar votação</button>`;
+  }
+  $('#edHead').innerHTML = `${back}
+    <h1 style="margin:12px 0 4px">${esc(el.title)}</h1>
+    <p><span class="chip ${esc(el.status)}">${esc(STATUS_LABEL[el.status])}</span>
+      <span class="muted small" id="edCount"> ${nfInt.format(E.candidates.length)} candidato(s) · ${nfInt.format(E.voteCount || 0)} voto(s) registrados</span></p>
+    ${action ? `<div class="row">${action}</div>` : ''}
+    ${el.status === 'draft' && !E.candidates.length ? '<p class="muted small">Cadastre ao menos um candidato para poder abrir a votação.</p>' : ''}
+    ${el.status === 'draft' ? '<p class="muted small">Depois de aberta, a votação trava candidatos, números, dígitos e voto em branco para proteger os votos.</p>' : ''}
+    ${el.status === 'open' ? '<p class="muted small">Encerrar é definitivo: a votação não pode ser reaberta.</p>' : ''}`;
+}
+
+function renderEdTabs() {
+  const E = S.editor;
+  if (!E.election) { $('#edTabs').innerHTML = ''; return; }
+  const tabs = [['candidatos', 'Candidatos'], ['configurar', 'Configurar'], ['compartilhar', 'Compartilhar'], ['apuracao', 'Apuração']];
+  $('#edTabs').innerHTML = tabs.map(([k, l]) =>
+    `<button class="btn secondary sm" role="tab" type="button" data-action="edTab" data-tab="${k}" aria-selected="${E.tab === k}">${l}</button>`).join('');
+}
+
+function renderEdPanel() {
+  const E = S.editor;
+  const fn = { candidatos: panelCandidates, configurar: panelConfig, compartilhar: panelShare, apuracao: panelResults }[E.tab];
+  $('#edPanel').innerHTML = fn();
+}
+
+/* --- Aba Configurar --- */
+function panelConfig() {
+  const el = S.editor.election;
+  const draft = !el || el.status === 'draft';
+  const hasCands = S.editor.candidates.length > 0;
+  const v = el || { title: '', description: '', digits: 2, allow_blank: true, results_public: true };
+  const digitOpts = [1, 2, 3, 4, 5].map(n => `<option value="${n}" ${v.digits === n ? 'selected' : ''}>${n} dígito${n > 1 ? 's' : ''}</option>`).join('');
+  return `<section class="card"><h2>${el ? 'Configurações' : 'Dados da eleição'}</h2>
+    <form data-form="saveElection" novalidate>
+      <div class="field"><label for="eTitle">Nome da eleição</label>
+        <input id="eTitle" type="text" maxlength="100" value="${esc(v.title)}" placeholder="Ex.: Representante do 8º ano A" required></div>
+      <div class="field"><label for="eDesc">Descrição <span class="hint">(opcional)</span></label>
+        <textarea id="eDesc" maxlength="300" placeholder="Ex.: Eleição de representante de turma">${esc(v.description)}</textarea></div>
+      <div class="field"><label for="eDigits">Dígitos do número de votação</label>
+        <select id="eDigits" ${draft && !hasCands ? '' : 'disabled'}>${digitOpts}</select>
+        <span class="hint">${draft ? (hasCands ? 'Para mudar, remova antes os candidatos.' : 'Todos os candidatos terão números com esta quantidade de dígitos.') : 'Bloqueado: a votação já começou.'}</span></div>
+      <div class="field"><label class="check"><input id="eBlank" type="checkbox" ${v.allow_blank ? 'checked' : ''} ${draft ? '' : 'disabled'}>
+        <span>Permitir voto em branco${draft ? '' : ' (bloqueado: a votação já começou)'}</span></label></div>
+      <div class="field"><label class="check"><input id="ePublic" type="checkbox" ${v.results_public ? 'checked' : ''}>
+        <span>Divulgar a apuração para todos depois que a eleição for encerrada
+          <span class="hint"><br>Enquanto a votação estiver aberta, só você vê a apuração.</span></span></label></div>
+      <p class="fmsg" role="status"></p>
+      <div class="row"><button class="btn" type="submit">${el ? 'Salvar alterações' : 'Criar eleição'}</button></div>
+    </form></section>
+    ${el ? `<section class="card"><h2>Excluir eleição</h2><p class="muted small">Apaga a eleição, os candidatos e todos os votos. Não dá para desfazer.</p>
+      <button class="btn secondary" type="button" data-action="deleteElection" data-confirm="Confirmar: excluir tudo?">Excluir eleição</button></section>` : ''}`;
+}
+
+/* --- Aba Candidatos --- */
+function panelCandidates() {
+  const E = S.editor, el = E.election, locked = el.status !== 'draft';
+  const cur = E.editId ? E.candidates.find(c => c.id === E.editId) : null;
+  const items = E.candidates.length ? `<ul class="cands">${E.candidates.map(c => `
+    <li class="cand"><img src="${esc(photoSrc(c.photo_url))}" alt="" loading="lazy" referrerpolicy="no-referrer">
+      <div><div class="n">${esc(c.name)}</div><div class="muted small">${esc(c.party || 'Sem partido ou grupo')}</div></div>
+      <span class="num" title="Número de votação">${esc(c.number)}</span>
+      ${locked ? '' : `<div class="acts"><button class="btn secondary sm" type="button" data-action="editCandidate" data-id="${esc(c.id)}">Editar</button>
+        <button class="btn secondary sm" type="button" data-action="removeCandidate" data-id="${esc(c.id)}" data-confirm="Confirmar remoção?">Remover</button></div>`}
+    </li>`).join('')}</ul>`
+    : '<p class="muted">Nenhum candidato ainda. Use o formulário abaixo para adicionar o primeiro.</p>';
+  const form = locked
+    ? '<p class="notice">Candidatos bloqueados: a votação já começou. Isso protege os votos já registrados.</p>'
+    : `<h2>${cur ? 'Editar candidato' : 'Adicionar candidato'}</h2>
+      <form data-form="saveCandidate" novalidate>
+        <div class="field"><label for="cName">Nome completo</label><input id="cName" type="text" maxlength="80" value="${esc(cur ? cur.name : '')}" required></div>
+        <div class="field"><label for="cNumber">Número de votação <span class="hint">(${el.digits} dígito${el.digits > 1 ? 's' : ''})</span></label>
+          <input id="cNumber" type="text" inputmode="numeric" autocomplete="off" maxlength="${el.digits}" value="${esc(cur ? cur.number : '')}" required></div>
+        <div class="field"><label for="cParty">Partido ou grupo <span class="hint">(opcional)</span></label><input id="cParty" type="text" maxlength="60" value="${esc(cur ? cur.party : '')}"></div>
+        <div class="field"><label for="cPhoto">Endereço da foto <span class="hint">(opcional; precisa começar com https://)</span></label>
+          <input id="cPhoto" type="url" inputmode="url" maxlength="500" value="${esc(cur && cur.photo_url ? cur.photo_url : '')}" placeholder="https://...">
+          <img id="cPrev" class="photo-prev" alt="Prévia da foto" referrerpolicy="no-referrer" ${cur && cur.photo_url ? `src="${esc(photoSrc(cur.photo_url))}"` : 'hidden'}></div>
+        <p class="fmsg" role="status"></p>
+        <div class="row"><button class="btn" type="submit">${cur ? 'Salvar candidato' : 'Adicionar candidato'}</button>
+          ${cur ? '<button class="btn ghost" type="button" data-action="cancelEdit">Cancelar</button>' : ''}</div>
+      </form>`;
+  return `<section class="card"><h2>Candidatos</h2>${items}</section><section class="card">${form}</section>`;
+}
+
+/* --- Aba Compartilhar --- */
+function panelShare() {
+  const el = S.editor.election, url = shareUrl(el.id);
+  const text = `Vote na eleição "${el.title}": ${url}`;
+  return `<section class="card"><h2>Link para os eleitores</h2>
+    ${location.protocol === 'file:' && !SITE_URL ? '<p class="notice error">Você abriu o arquivo direto do computador. Este link só vai funcionar para os eleitores depois que o site for publicado (GitHub Pages). Veja o README.</p>' : ''}
+    ${el.status === 'draft' ? '<p class="notice">A votação ainda não foi aberta. Quem abrir o link agora verá que ela ainda não começou.</p>' : ''}
+    ${el.status === 'closed' ? '<p class="notice">A eleição foi encerrada. O link continua mostrando que ela terminou.</p>' : ''}
+    <div class="linkbox"><input id="shareInput" type="text" readonly value="${esc(url)}" aria-label="Link da eleição"></div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" type="button" data-action="copyLink">Copiar link</button>
+      ${navigator.share ? '<button class="btn secondary" type="button" data-action="shareLink">Compartilhar</button>' : ''}
+      <a class="btn secondary" href="https://wa.me/?text=${encodeURIComponent(text)}" target="_blank" rel="noopener">WhatsApp</a>
+      <a class="btn secondary" href="${esc(url)}" target="_blank" rel="noopener">Abrir como eleitor</a>
+    </div>
+    <p class="muted small" style="margin-top:12px">Quem tiver o link pode votar, e o link pode ser repassado. Cada navegador conta como um eleitor.</p></section>`;
+}
+
+/* --- Aba Apuração --- */
+function panelResults() {
+  const E = S.editor, el = E.election;
+  return `<section class="card"><h2>Apuração</h2>
+    <div class="row" style="margin-bottom:12px">
+      <button class="btn secondary sm" type="button" data-action="refreshResults">Atualizar agora</button>
+      <button class="btn secondary sm" type="button" data-action="exportCsv" ${E.results ? '' : 'disabled'}>Exportar CSV</button>
+      ${el.status === 'open' ? `<label class="check small"><input type="checkbox" id="autoRef" ${E.auto ? 'checked' : ''}><span>Atualizar sozinha a cada 15 segundos</span></label>` : ''}
+    </div>
+    <div id="resBody">${resultsInner()}</div></section>`;
+}
+function resultsInner() {
+  const E = S.editor;
+  if (E.resultsErr) return `<p class="notice error">${esc(E.resultsErr)}</p>`;
+  if (!E.results) return '<p class="muted" role="status">Carregando apuração…</p>';
+  return resultsBodyHtml(E.results) + `<p class="muted small">Atualizado às ${esc(E.resultsAt ? E.resultsAt.toLocaleTimeString('pt-BR') : '')}.</p>`;
+}
+async function loadAdminResults() {
+  const E = S.editor;
+  if (!E || !E.election) return;
+  const { data, error } = await sb.rpc('get_election_results', { p_election_id: E.election.id });
+  if (S.editor !== E) return;
+  if (error) { console.error(error); E.resultsErr = friendly(error); }
+  else if (!data || !data.ok) { E.resultsErr = RES_MSG[data && data.code] || 'Não foi possível carregar a apuração.'; }
+  else { E.results = data; E.resultsErr = null; E.voteCount = data.total; E.resultsAt = new Date(); }
+  const body = $('#resBody');
+  if (body && E.tab === 'apuracao') body.innerHTML = resultsInner();
+  const exp = document.querySelector('[data-action="exportCsv"]');
+  if (exp) exp.disabled = !E.results;
+  const cnt = $('#edCount');
+  if (cnt) cnt.textContent = ` ${nfInt.format(E.candidates.length)} candidato(s) · ${nfInt.format(E.voteCount || 0)} voto(s) registrados`;
+}
+function startResultsTab() {
+  stopTimers();
+  loadAdminResults();
+  const E = S.editor;
+  if (E.election.status === 'open') {
+    timers.push(setInterval(() => {
+      if (S.editor === E && E.tab === 'apuracao' && E.auto && document.visibilityState === 'visible') loadAdminResults();
+    }, 15000));
+  }
+}
+
+function csvCell(v) {
+  let s = String(v ?? '');
+  if (/^[=+\-@\t\r]/.test(s)) s = "'" + s;     // evita fórmulas maliciosas no Excel
+  return '"' + s.replace(/"/g, '""') + '"';
+}
+function exportCsv() {
+  const r = S.editor && S.editor.results;
+  if (!r) return;
+  const total = r.total || 0, p = n => total ? nfPct.format(n / total * 100) : '0,0';
+  const rows = [['Posição', 'Candidato', 'Número', 'Partido', 'Votos', 'Percentual (%)']];
+  r.candidates.forEach(c => rows.push([1 + r.candidates.filter(o => o.votes > c.votes).length, c.name, c.number, c.party, c.votes, p(c.votes)]));
+  if (r.election.allow_blank) rows.push(['', 'Votos em branco', '', '', r.blank, p(r.blank)]);
+  rows.push(['', 'Total de votos computados', '', '', total, total ? '100,0' : '0,0']);
+  const csv = '\ufeff' + rows.map(x => x.map(csvCell).join(';')).join('\r\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }));
+  a.download = 'apuracao-urna-facil.csv';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+
+/* =====================================================================
+   7) AÇÕES (cliques e formulários)
+   ===================================================================== */
+function formMsg(form, text, kind = '') {
+  const m = form.querySelector('.fmsg');
+  if (m) { m.textContent = text; m.className = 'fmsg' + (kind ? ' ' + kind : ''); }
+}
+
+// Botões perigosos: o 1º toque "arma" o botão, o 2º toque executa (sem pop-ups).
+const armed = new WeakMap();
+function needsConfirm(btn) {
+  const label = btn.dataset.confirm;
+  if (!label) return false;
+  if (armed.has(btn)) { clearTimeout(armed.get(btn).t); btn.textContent = armed.get(btn).orig; btn.classList.remove('armed'); armed.delete(btn); return false; }
+  const orig = btn.textContent;
+  btn.textContent = label; btn.classList.add('armed');
+  armed.set(btn, { orig, t: setTimeout(() => { btn.textContent = orig; btn.classList.remove('armed'); armed.delete(btn); }, 6000) });
+  return true;
+}
+
+async function run(btn, fn) {
+  if (btn && btn.disabled) return;
+  if (btn) btn.disabled = true;
+  try { await fn(); }
+  catch (err) { console.error(err); toast(friendly(err), 'error'); }
+  finally { if (btn && btn.isConnected) btn.disabled = false; }
+}
+
+const actions = {
+  reload: () => location.reload(),
+  showResults: () => { V.showResults = true; renderVoter(); },
+  hideResults: () => { V.showResults = false; renderVoter(); },
+  logout: async () => { await sb.auth.signOut({ scope: 'local' }); },
+  authTab: b => { S.authTab = b.dataset.tab; renderAuth(); },
+  backHome: () => { stopTimers(); S.editor = null; startAdmin(); },
+  newElection: () => newElectionView(),
+  openElection: b => openEditor(b.dataset.id),
+  edTab: b => {
+    const E = S.editor; E.tab = b.dataset.tab; E.editId = null; stopTimers();
+    renderEdTabs(); renderEdPanel();
+    if (E.tab === 'apuracao') startResultsTab();
+  },
+  editCandidate: b => { S.editor.editId = b.dataset.id; renderEdPanel(); const f = $('#cName'); if (f) f.focus(); },
+  cancelEdit: () => { S.editor.editId = null; renderEdPanel(); },
+  removeCandidate: (b) => run(b, async () => {
+    const E = S.editor;
+    const { error } = await sb.from('candidates').delete().eq('id', b.dataset.id);
+    if (error) throw error;
+    E.candidates = E.candidates.filter(c => c.id !== b.dataset.id);
+    if (E.editId === b.dataset.id) E.editId = null;
+    renderEdHead(); renderEdPanel(); toast('Candidato removido.', 'ok');
+  }),
+  startVoting: b => run(b, async () => {
+    const E = S.editor;
+    const { data, error } = await sb.from('elections').update({ status: 'open' }).eq('id', E.election.id).select().single();
+    if (error) throw error;
+    E.election = data; E.tab = 'compartilhar';
+    renderEdHead(); renderEdTabs(); renderEdPanel();
+    toast('Votação aberta. Compartilhe o link para receber votos.', 'ok');
+  }),
+  closeVoting: b => run(b, async () => {
+    const E = S.editor;
+    const { data, error } = await sb.from('elections').update({ status: 'closed' }).eq('id', E.election.id).select().single();
+    if (error) throw error;
+    E.election = data; E.tab = 'apuracao';
+    renderEdHead(); renderEdTabs(); renderEdPanel(); startResultsTab();
+    toast('Votação encerrada.', 'ok');
+  }),
+  deleteElection: b => run(b, async () => {
+    const { error } = await sb.from('elections').delete().eq('id', S.editor.election.id);
+    if (error) throw error;
+    S.editor = null; toast('Eleição excluída.', 'ok'); await startAdmin();
+  }),
+  copyLink: async () => {
+    const input = $('#shareInput');
+    try { await navigator.clipboard.writeText(input.value); toast('Link copiado.', 'ok'); }
+    catch { input.focus(); input.select(); toast('Não foi possível copiar sozinho. O link está selecionado: copie manualmente.', 'error'); }
+  },
+  shareLink: async () => {
+    const el = S.editor.election;
+    try { await navigator.share({ title: el.title, text: `Vote na eleição "${el.title}"`, url: shareUrl(el.id) }); } catch { /* cancelado */ }
+  },
+  refreshResults: b => run(b, () => loadAdminResults()),
+  exportCsv: () => exportCsv()
+};
+
+const forms = {
+  async login(f) {
+    const email = $('#aEmail', f).value.trim(), pass = $('#aPass', f).value;
+    if (!email || !pass) return formMsg(f, 'Preencha o e-mail e a senha.', 'error');
+    const btn = f.querySelector('[type=submit]'); btn.disabled = true; formMsg(f, 'Entrando…');
+    const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+    btn.disabled = false;
+    if (error) { console.error(error); formMsg(f, friendly(error), 'error'); }
+    // sucesso: onAuthStateChange abre a tela inicial
+  },
+  async signup(f) {
+    const email = $('#aEmail', f).value.trim(), pass = $('#aPass', f).value;
+    if (!/^\S+@\S+\.\S+$/.test(email)) return formMsg(f, 'Informe um e-mail válido.', 'error');
+    if (pass.length < 8) return formMsg(f, 'A senha precisa ter pelo menos 8 caracteres.', 'error');
+    const btn = f.querySelector('[type=submit]'); btn.disabled = true; formMsg(f, 'Criando conta…');
+    const { data, error } = await sb.auth.signUp({ email, password: pass, options: { emailRedirectTo: pageBase() } });
+    btn.disabled = false;
+    if (error) { console.error(error); return formMsg(f, friendly(error), 'error'); }
+    if (data.session) return;   // projeto sem confirmação de e-mail: já está logado
+    if (data.user && Array.isArray(data.user.identities) && data.user.identities.length === 0) {
+      return formMsg(f, 'Este e-mail já pode ter uma conta. Tente a aba "Entrar".', 'error');
+    }
+    formMsg(f, 'Conta criada. Enviamos uma mensagem para o seu e-mail: clique no link de confirmação e depois volte aqui para entrar.', 'ok');
+  },
+  async saveElection(f) {
+    const E = S.editor, el = E.election;
+    const title = $('#eTitle', f).value.trim(), description = $('#eDesc', f).value.trim();
+    if (title.length < 3) return formMsg(f, 'Dê um nome à eleição (mínimo de 3 letras).', 'error');
+    const btn = f.querySelector('[type=submit]'); btn.disabled = true; formMsg(f, 'Salvando…');
+    try {
+      const results_public = $('#ePublic', f).checked;
+      if (!el) {
+        const row = { title, description, digits: Number($('#eDigits', f).value), allow_blank: $('#eBlank', f).checked, results_public };
+        const { data, error } = await sb.from('elections').insert(row).select().single();
+        if (error) throw error;
+        toast('Eleição criada. Agora cadastre os candidatos.', 'ok');
+        await loadElections().catch(() => {});
+        return openEditor(data.id, 'candidatos');
+      }
+      const patch = { title, description, results_public };
+      if (el.status === 'draft') {
+        patch.allow_blank = $('#eBlank', f).checked;
+        if (!E.candidates.length) patch.digits = Number($('#eDigits', f).value);
+      }
+      const { data, error } = await sb.from('elections').update(patch).eq('id', el.id).select().single();
+      if (error) throw error;
+      E.election = data;
+      renderEdHead(); renderEdPanel(); toast('Alterações salvas.', 'ok');
+    } catch (err) {
+      console.error(err); formMsg(f, friendly(err), 'error');
+    } finally { btn.disabled = false; }
+  },
+  async saveCandidate(f) {
+    const E = S.editor, el = E.election;
+    const name = $('#cName', f).value.trim(), number = $('#cNumber', f).value.trim();
+    const party = $('#cParty', f).value.trim(), photo = $('#cPhoto', f).value.trim();
+    if (name.length < 2) return formMsg(f, 'Informe o nome completo do candidato.', 'error');
+    if (!/^\d+$/.test(number) || number.length !== el.digits) return formMsg(f, `O número deve ter exatamente ${el.digits} dígito(s), só com algarismos.`, 'error');
+    if (E.candidates.some(c => c.number === number && c.id !== E.editId)) return formMsg(f, 'Este número já está em uso nesta eleição.', 'error');
+    if (photo) {
+      let ok = /^https:\/\/\S+$/i.test(photo) && photo.length <= 500;
+      try { new URL(photo); } catch { ok = false; }
+      if (!ok) return formMsg(f, 'O endereço da foto deve começar com https:// e ser um link válido.', 'error');
+    }
+    const btn = f.querySelector('[type=submit]'); btn.disabled = true; formMsg(f, 'Salvando…');
+    try {
+      if (E.editId) {
+        const { data, error } = await sb.from('candidates').update({ name, number, party, photo_url: photo || null }).eq('id', E.editId).select().single();
+        if (error) throw error;
+        E.candidates = E.candidates.map(c => c.id === data.id ? data : c);
+        E.editId = null;
+      } else {
+        const { data, error } = await sb.from('candidates').insert({ election_id: el.id, name, number, party, photo_url: photo || null }).select().single();
+        if (error) throw error;
+        E.candidates.push(data);
+      }
+      E.candidates.sort((a, b) => a.number.localeCompare(b.number));
+      renderEdHead(); renderEdPanel(); toast('Candidato salvo.', 'ok');
+      const first = $('#cName'); if (first) first.focus();
+    } catch (err) {
+      console.error(err); formMsg(f, friendly(err), 'error');
+    } finally { btn.disabled = false; }
+  }
+};
+
+app.addEventListener('click', e => {
+  const b = e.target.closest('[data-key], [data-action]');
+  if (!b || !app.contains(b)) return;
+  if (b.dataset.key !== undefined) return pressKey(b.dataset.key);
+  if (needsConfirm(b)) return;
+  const fn = actions[b.dataset.action];
+  if (fn) fn(b, e);
+});
+app.addEventListener('submit', e => {
+  const f = e.target.closest('form[data-form]');
+  if (!f) return;
+  e.preventDefault();
+  const fn = forms[f.dataset.form];
+  if (fn) fn(f).catch(err => { console.error(err); formMsg(f, friendly(err), 'error'); });
+});
+app.addEventListener('change', e => {
+  if (e.target.id === 'cPhoto') {
+    const prev = $('#cPrev'), v = e.target.value.trim();
+    if (prev) { if (/^https:\/\/\S+$/i.test(v)) { prev.dataset.failed = ''; prev.src = v; prev.hidden = false; } else { prev.hidden = true; } }
+  }
+  if (e.target.id === 'autoRef' && S.editor) S.editor.auto = e.target.checked;
+});
+// Botões da urna (ficam fora do data-action porque têm ids próprios)
+app.addEventListener('click', e => {
+  const id = e.target.closest('button') && e.target.closest('button').id;
+  if (id === 'fixBtn') correct();
+  else if (id === 'blankBtn') blankVote();
+  else if (id === 'okBtn') confirmVote();
+});
+
+boot();
+</script>
+</body>
+</html>
